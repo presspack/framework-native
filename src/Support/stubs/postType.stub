@@ -1,0 +1,13 @@
+<?php
+
+namespace DummyNamespace;
+
+use Presspack\Framework\CustomPostType;
+
+class DummyClass extends CustomPostType
+{
+    // public $postType;
+    // public $singularName;
+    // public $pluralName;
+    // public $dashicon = 'admin-post';
+}
