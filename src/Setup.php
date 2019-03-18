@@ -6,10 +6,9 @@ class Setup
 {
     public $config;
 
-    public function __construct()
+    public function __construct($path)
     {
-        $reflection = new \ReflectionClass(\Composer\Autoload\ClassLoader::class);
-        $basePath = \dirname(\dirname(\dirname($reflection->getFileName())));
+        $basePath = \dirname($path, 2);
 
         $this->config = require_once $basePath.'/config/presspack.php';
 
@@ -18,12 +17,15 @@ class Setup
         add_action('init', [$this, 'registerTemplates']);
         add_action('init', [$this, 'registerTaxonomies']);
         add_action('init', [$this, 'registerMenus']);
+        add_action('after_setup_theme', [$this, 'registerImageSizes']);
         add_filter('flush_rewrite_rules_hard', '__return_false');
+        add_filter('use_block_editor_for_post', '__return_false', 10); // disable gutenberg for posts
+        add_filter('use_block_editor_for_post_type', '__return_false', 10); // disable gutenberg for post types
     }
 
-    public static function bootstrap()
+    public static function bootstrap($path)
     {
-        return new static();
+        return new static($path);
     }
 
     public function themeSetup()
@@ -63,6 +65,13 @@ class Setup
     {
         foreach ($this->config['menus'] as $menu) {
             register_nav_menu($menu, $menu);
+        }
+    }
+
+    public function registerImageSizes()
+    {
+        foreach ($this->config['image_sizes'] as $key => $sizes) {
+            add_image_size($key, $sizes[0], $sizes[1], isset($sizes[2]) ? $sizes[2] : true);
         }
     }
 }

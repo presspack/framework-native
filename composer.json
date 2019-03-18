@@ -45,7 +45,7 @@
         "Presspack\\Framework\\Providers\\ServiceProvider"
       ],
       "aliases": {
-        "Localize": "Presspack\\Framework\\Support\\Facades\\LocalizeFacade",
+        "Localize": "Presspack\\Framework\\Support\\Facades\\LocalizeFacade"
       }
     }
   }

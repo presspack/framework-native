@@ -30,7 +30,7 @@ class Post
     ];
 
     /** @var bool */
-    protected $acf = false;
+    protected $acf = true;
 
     /** @var string */
     protected $translate;
@@ -53,6 +53,7 @@ class Post
         $this->args = [
             'p' => $postId,
             'post_type' => 'any',
+            'suppress_filters' => true,
         ];
 
         return $this->get()->first();
@@ -61,7 +62,7 @@ class Post
     protected function slug(string $slug)
     {
         $this->args['name'] = $slug;
-        $this->args['post_type'] = 'any';
+        $this->args['suppress_filters'] = true;
 
         return $this->get()->first();
     }
@@ -127,12 +128,12 @@ class Post
             'ID' => $item->ID,
             'title' => $item->post_title,
             'slug' => $item->post_name,
-            'category' => $this->getCategories($item),
+            'category' => self::getCategories($item),
             'date' => $item->post_date,
             'timeago' => Carbon::parse($item->post_date)->diffForHumans(),
             'content' => apply_filters('the_content', $item->post_content),
-            'featured_image' => get_the_post_thumbnail_url($item->ID),
-            'fields' => $this->getFields($item),
+            'featured_image' => self::getFeaturedImage($item->ID),
+            'fields' => self::getFields($item),
         ];
     }
 
@@ -154,6 +155,19 @@ class Post
         }
 
         return false;
+    }
+
+    protected function getFeaturedImage(int $postId)
+    {
+        $featuredImage = wp_get_attachment_metadata(get_post_thumbnail_id($postId));
+        $featuredImage['url'] = asset("/content/uploads/{$featuredImage['file']}");
+
+        $featuredImage['sizes'] = Collection::make($featuredImage['sizes'])
+            ->map(function($item) {
+                $item['url'] = asset("/content/uploads/{$item['file']}");
+                return $item;
+            });
+        return $featuredImage;
     }
     
     protected function translate($lang = null)
@@ -177,7 +191,7 @@ class Post
         }
 
         $this->translate = null;
-
+        
         return collect([$this->find($translations->element_id)]);
     }
 }
