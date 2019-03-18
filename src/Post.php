@@ -160,13 +160,15 @@ class Post
     protected function getFeaturedImage(int $postId)
     {
         $featuredImage = wp_get_attachment_metadata(get_post_thumbnail_id($postId));
-        $featuredImage['url'] = asset("/content/uploads/{$featuredImage['file']}");
+        if ($featuredImage) {
+            $featuredImage['url'] = asset("/content/uploads/{$featuredImage['file']}");
 
-        $featuredImage['sizes'] = Collection::make($featuredImage['sizes'])
-            ->map(function($item) {
-                $item['url'] = asset("/content/uploads/{$item['file']}");
-                return $item;
-            });
+            $featuredImage['sizes'] = Collection::make($featuredImage['sizes'])
+                ->map(function ($item) {
+                    $item['url'] = asset("/content/uploads/{$item['file']}");
+                    return $item;
+                });
+        }
         return $featuredImage;
     }
     
