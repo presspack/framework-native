@@ -10,7 +10,7 @@ use Presspack\Framework\Support\Translation;
 
 class Post
 {
-    use isFacade;
+    use IsFacade;
 
     /** @var string */
     public $postType = 'post';
@@ -34,7 +34,6 @@ class Post
 
     /** @var string */
     protected $translate;
-
 
     protected function __construct()
     {
@@ -166,12 +165,14 @@ class Post
             $featuredImage['sizes'] = Collection::make($featuredImage['sizes'])
                 ->map(function ($item) {
                     $item['url'] = asset("/content/uploads/{$item['file']}");
+
                     return $item;
                 });
         }
+
         return $featuredImage;
     }
-    
+
     protected function translate($lang = null)
     {
         $this->translate = $lang ?: App::getLocale();
@@ -193,8 +194,7 @@ class Post
         }
 
         $this->translate = null;
-        
+
         return collect([$this->find($translations->element_id)]);
     }
 }
-
